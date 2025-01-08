@@ -1,0 +1,7 @@
+{
+  "Name": "Death Counter",
+  "Author": "VTXG",
+  "Description": "Makes it so the life counter layout displays the Player's death count.",
+  "InstallDependencies": ["Syati_Init"],
+  "Install":"git:https://github.com/VTXG/DeathCounter"
+}
