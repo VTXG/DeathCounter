@@ -22,3 +22,5 @@ kmCall(0x80488D2C+REGIONOFF, DeathCounterSystem::getMissCount); // PlayerLeft::i
 kmCall(0x80488EE8+REGIONOFF, DeathCounterSystem::getMissCount); // PlayerLeft::exeHide
 kmCall(0x80488FE0+REGIONOFF, DeathCounterSystem::getMissCount); // PlayerLeft::exeWait
 kmCall(0x80489038+REGIONOFF, DeathCounterSystem::getMissCount); // PlayerLeft::exeWait
+kmCall(0x8048EB1C+REGIONOFF, DeathCounterSystem::getMissCount); // ScenarioSelectLayout::setPlayerLeft
+kmCall(0x8048EB30+REGIONOFF, DeathCounterSystem::getMissCount); // ScenarioSelectLayout::setPlayerLeft
