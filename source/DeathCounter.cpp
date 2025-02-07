@@ -32,5 +32,5 @@ kmWrite32(0x80489434+REGIONOFF, 0x38A5FFFF); // ::exeAppear (addi r5, r5, -1)
 kmCall(0x80489514+REGIONOFF, DeathCounterSystem::getMissCount); // ::exeWait
 
 // ScenarioSelectLayout
-kmCall(0x8048EB1C+REGIONOFF, DeathCounterSystem::getMissCount); // ::setPlayerLeft
-kmCall(0x8048EB30+REGIONOFF, DeathCounterSystem::getMissCount); // ::setPlayerLeft
+// kmCall(0x8048EB1C+REGIONOFF, DeathCounterSystem::getMissCount); // ::setPlayerLeft
+// kmCall(0x8048EB30+REGIONOFF, DeathCounterSystem::getMissCount); // ::setPlayerLeft
