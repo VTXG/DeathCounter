@@ -32,14 +32,14 @@ kmWrite32(0x80488E9C+REGIONOFF, 0x7FE3FB78); // mr r3, r31
 kmCall(0x80488EA0+REGIONOFF, showDeathCounterIfDead); // bl showDeathCounterIfDead
 
 void skipDisappearingPlayerLeft(PlayerLeft* pPlayerLeft) {
-    if (isDeadAndNotInFaceShipOrWorldMap())
+    if (!MR::isPlayerDead())
         pPlayerLeft->disappear();
 }
 
 kmCall(0x80465BAC+REGIONOFF, skipDisappearingPlayerLeft); // bl skipDisappearingPlayerLeft
 
 void skipAppearingPlayerLeft(PlayerLeft* pPlayerLeft) {
-    if (isDeadAndNotInFaceShipOrWorldMap())
+    if (!MR::isPlayerDead())
         pPlayerLeft->forceAppear();
 }
 
