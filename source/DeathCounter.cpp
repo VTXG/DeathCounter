@@ -1,5 +1,4 @@
 #include "DeathCounter.h"
-#include "syati.h"
 
 #if defined(TWN) || defined(KOR)
 #define REGIONOFF 0x10
@@ -7,7 +6,7 @@
 #define REGIONOFF 0
 #endif
 
-s32 DeathCounterSystem::getMissCount() {
+s32 getMissCount() {
     UserFile* file = GameDataFunction::getSaveDataHandleSequence()->getCurrentUserFile();
 
     if (file != NULL) {
@@ -17,20 +16,64 @@ s32 DeathCounterSystem::getMissCount() {
     return 0;
 }
 
+void showDeathCounterIfDead(PlayerLeft* pPlayerLeft) {
+    pPlayerLeft->mPaneRumbler->update();
+
+    Nerve* pNerveCountUp = &NrvPlayerLeftExt::NrvDeathCounterCountUp::sInstance;
+
+    if (MR::isPlayerDead() && !pPlayerLeft->isNerve(pNerveCountUp))
+        pPlayerLeft->setNerve(pNerveCountUp);
+}
+kmWrite32(0x80488E9C+REGIONOFF, 0x7FE3FB78); // mr r3, r31
+kmCall(0x80488EA0+REGIONOFF, showDeathCounterIfDead); // bl showDeathCounterIfDead
+
+void skipDisappearingPlayerLeft(PlayerLeft* pPlayerLeft) {
+    if (!MR::isPlayerDead())
+        pPlayerLeft->disappear();
+}
+
+kmCall(0x80465BAC+REGIONOFF, skipDisappearingPlayerLeft); // bl skipDisappearingPlayerLeft
+
+void skipAppearingPlayerLeft(PlayerLeft* pPlayerLeft) {
+    if (!MR::isPlayerDead())
+        pPlayerLeft->forceAppear();
+}
+
+kmCall(0x80465B2C+REGIONOFF, skipAppearingPlayerLeft); // bl skipDisappearingPlayerLeft
+
 // PauseMenu
-kmCall(0x80487140+REGIONOFF, DeathCounterSystem::getMissCount); // ::appear
+kmCall(0x80487140+REGIONOFF, getMissCount); // ::appear
 
 // PlayerLeft
-kmCall(0x80488D2C+REGIONOFF, DeathCounterSystem::getMissCount); // ::init
-kmCall(0x80488EE8+REGIONOFF, DeathCounterSystem::getMissCount); // ::exeHide
-kmCall(0x80488FE0+REGIONOFF, DeathCounterSystem::getMissCount); // ::exeWait
-kmCall(0x80489038+REGIONOFF, DeathCounterSystem::getMissCount); // ::exeWait
+kmCall(0x80488D2C+REGIONOFF, getMissCount); // ::init
+kmCall(0x80488EE8+REGIONOFF, getMissCount); // ::exeHide
+kmCall(0x80488FE0+REGIONOFF, getMissCount); // ::exeWait
+kmCall(0x80489038+REGIONOFF, getMissCount); // ::exeWait
 
-// PlayerMissLeft
-kmCall(0x80489424+REGIONOFF, DeathCounterSystem::getMissCount); // ::exeAppear
-kmWrite32(0x80489434+REGIONOFF, 0x38A5FFFF); // ::exeAppear (addi r5, r5, -1)
-kmCall(0x80489514+REGIONOFF, DeathCounterSystem::getMissCount); // ::exeWait
+kmWrite32(0x804B43A4+REGIONOFF, 0x48000058); // b 0x58
 
-// ScenarioSelectLayout
-// kmCall(0x8048EB1C+REGIONOFF, DeathCounterSystem::getMissCount); // ::setPlayerLeft
-// kmCall(0x8048EB30+REGIONOFF, DeathCounterSystem::getMissCount); // ::setPlayerLeft
+namespace NrvPlayerLeftExt {
+    void NrvDeathCounterCountUp::execute(Spine* pSpine) const {
+        PlayerLeft* pPlayerLeft = (PlayerLeft*)pSpine->mExecutor;
+
+        if (MR::isFirstStep(pPlayerLeft)) {
+            if (pPlayerLeft->mAppearer->isDisappeared()) {
+                pPlayerLeft->LayoutActor::appear();
+                pPlayerLeft->mAppearer->reset();
+                pPlayerLeft->mPaneRumbler->reset();
+                pPlayerLeft->mAppearer->appear(TVec2f(0.0f, 0.0f));
+                MR::showLayout(pPlayerLeft);
+                MR::startAnim(pPlayerLeft, "Wait", 1);
+            }
+        }
+
+        if (MR::isStep(pPlayerLeft, 30)) {
+            pPlayerLeft->mNumPlayersLeft += 1;
+            MR::startAnim(pPlayerLeft, "Flash", 0);
+            pPlayerLeft->mPaneRumbler->start();
+            MR::startSystemSE("SE_SY_BEAT_ENEMY_COUNT_UP", -1, -1);
+        }
+    }
+
+    NrvDeathCounterCountUp(NrvDeathCounterCountUp::sInstance);
+}

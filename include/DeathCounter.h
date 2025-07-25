@@ -1,6 +1,10 @@
 #pragma once
-#include "revolution.h"
 
-namespace DeathCounterSystem {
-    s32 getMissCount();
-}
+#include "revolution.h"
+#include "syati.h"
+#include "Game/Screen/PlayerLeft.h"
+
+
+namespace NrvPlayerLeftExt {
+    NERVE(NrvDeathCounterCountUp);
+};
